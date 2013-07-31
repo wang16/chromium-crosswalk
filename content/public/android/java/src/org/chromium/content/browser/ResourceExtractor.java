@@ -37,6 +37,8 @@ public class ResourceExtractor {
     private static final String LAST_LANGUAGE = "Last language";
     private static final String PAK_FILENAMES = "Pak filenames";
 
+    private static final String g_lib_package_name = "org.xwalk.runtime.lib";
+
     private static String[] sMandatoryPaks = null;
 
     // By default, we attempt to extract a pak file for the users
@@ -103,7 +105,15 @@ public class ResourceExtractor {
             }
             Pattern paksToInstall = Pattern.compile(p.toString());
 
-            AssetManager manager = mContext.getResources().getAssets();
+            AssetManager manager = null;
+            try {
+                Context libCtx = mContext.createPackageContext(
+                    g_lib_package_name,
+                    Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
+                manager = libCtx.getResources().getAssets();
+            } catch (Exception e) {
+                manager = mContext.getResources().getAssets();
+            }
             try {
                 // Loop through every asset file that we have in the APK, and look for the
                 // ones that we need to extract by trying to match the Patterns that we
