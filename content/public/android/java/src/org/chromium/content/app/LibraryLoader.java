@@ -31,6 +31,8 @@ import org.chromium.content.common.TraceEvent;
 public class LibraryLoader {
     private static final String TAG = "LibraryLoader";
 
+    private static final String g_lib_package_name = "org.xwalk.runtime.lib";
+
     // Guards all access to the libraries
     private static final Object sLock = new Object();
 
@@ -102,7 +104,11 @@ public class LibraryLoader {
                 assert !sInitialized;
                 for (String sLibrary : NativeLibraries.libraries) {
                     Log.i(TAG, "loading: " + sLibrary);
-                    System.loadLibrary(sLibrary);
+                    try {
+                        System.loadLibrary(sLibrary);
+                    } catch (UnsatisfiedLinkError e) {
+                        System.load("/data/data/" + g_lib_package_name + "/lib/lib" + sLibrary + ".so");
+                    }
                     Log.i(TAG, "loaded: " + sLibrary);
                 }
                 sLoaded = true;
